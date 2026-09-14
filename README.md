@@ -1,14 +1,26 @@
-# Streamlit Authentication Template
+# YouTube RAG Chatbot
 
-A reusable authentication template for Streamlit apps, with Google OIDC, email/OTP verification, and Neon PostgreSQL.
+A secure Streamlit application where users can register or log in, load a
+YouTube video, and ask questions from its transcript using RAG.
+
+## Features
+
+- Email/OTP login and Google OIDC login
+- YouTube transcript loading
+- ChromaDB vector search and Hugging Face LLM responses
+- Answers restricted to the selected video's transcript
+
+## Tech stack
+
+Streamlit, LangChain, ChromaDB, Hugging Face, PostgreSQL/Neon, and Google OIDC.
 
 ## Setup
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Akshay-3210/auth-in-streamlit.git
-cd auth-in-streamlit
+git clone https://github.com/Akshay-3210/YouTube-RAG-Chatbot.git
+cd YouTube-RAG-Chatbot
 ```
 
 ### 2. Create and activate a virtual environment
@@ -87,10 +99,43 @@ In Google Cloud Console:
 
 Never commit `.streamlit/secrets.toml` to GitHub.
 
-### 7. Run the app
+### 7. Run the app locally
 
 ```bash
 streamlit run app.py
 ```
 
 Open `http://localhost:8501` in your browser.
+
+## Deploy on Streamlit Community Cloud
+
+1. Deploy the repository with `app.py` as the main file.
+2. In **App settings → Secrets**, add all values from both local `.env` files
+   and the Google OIDC configuration. Use TOML format:
+
+```toml
+DATABASE_URL = "your-neon-database-url"
+SMTP_EMAIL = "your-email@gmail.com"
+SMTP_PASSWORD = "your-gmail-app-password"
+HUGGINGFACEHUB_API_TOKEN = "your-hugging-face-token"
+CHROMA_API_KEY = "your-chroma-api-key"
+CHROMA_TENANT = "your-chroma-tenant"
+CHROMA_DATABASE = "your-chroma-database"
+
+[auth]
+redirect_uri = "https://your-app.streamlit.app/oauth2callback"
+cookie_secret = "a-long-random-secret"
+client_id = "your-google-oauth-client-id"
+client_secret = "your-google-oauth-client-secret"
+server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
+```
+
+3. In Google Cloud Console, add this exact value as an **Authorized redirect
+   URI** (replace it with your deployed app URL):
+
+```text
+https://your-app.streamlit.app/oauth2callback
+```
+
+`Authlib` is listed in `requirements.txt` because Streamlit requires it for
+`st.login()`.
