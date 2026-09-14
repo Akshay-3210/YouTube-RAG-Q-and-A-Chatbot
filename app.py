@@ -1,26 +1,9 @@
 import streamlit as st
 from auth import google_login,generate_otp,verify_otp,save_otp,register_user,send_otp_email,login_user
+from ytchatbot.app import render_youtube_chatbot
 
-st.title("My App")
+st.title("Youtube Video Q&A App")
 
-# if st.user.is_logged_in:
-#         user=google_login(st.user.name,st.user.email,st.user.sub)
-#         if user is None:
-#             st.error("user not saved")
-#             st.stop()
-#         st.session_state["user"]=user
-        
-#         st.success("Google login successful")
-#         st.write("Hello ",user["name"])
-#         st.write(user["email"])
-
-#         if st.button("log out"):
-#             st.session_state.clear()
-#             st.logout()
-
-# else:
-#         if st.button("Log in with Google"):
-#             st.login()
 
 if st.user.is_logged_in:
     user = google_login(st.user.name,st.user.email,st.user.sub)
@@ -40,6 +23,9 @@ if "user" in st.session_state:
         if st.user.is_logged_in:
             st.logout()
         # st.rerun()
+    st.divider()
+    render_youtube_chatbot()
+        
 
 else:
     register_tab, login_tab = st.tabs(["Register", "Login"])

@@ -6,8 +6,10 @@ import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-load_dotenv()
+# Keep auth settings isolated from the YouTube chatbot service settings.
+load_dotenv(Path(__file__).with_name(".env"))
 
 def google_login(name,email,google_id):
     conn=get_connection()

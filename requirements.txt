@@ -1,0 +1,11 @@
+streamlit
+python-dotenv
+psycopg2-binary
+bcrypt
+chromadb
+langchain-chroma
+langchain-classic
+langchain-core
+langchain-huggingface
+huggingface-hub
+youtube-transcript-api

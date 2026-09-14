@@ -1,3 +1,7 @@
 .env
-/.streamlit/secrets.toml
+ytchatbot/.env
+.streamlit/secrets.toml
 __pycache__/
+*.py[cod]
+.venv/
+venv/
