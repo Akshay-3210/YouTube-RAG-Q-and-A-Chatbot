@@ -1,18 +1,21 @@
 # YouTube RAG Chatbot
 
+![YouTube RAG Chatbot screenshot](image.png)
+
 A secure Streamlit application where users can register or log in, load a
 YouTube video, and ask questions from its transcript using RAG.
 
 ## Features
 
 - Email/OTP login and Google OIDC login
-- YouTube transcript loading
-- ChromaDB vector search and Hugging Face LLM responses
+- YouTube transcript loading, with a paste-in option when Cloud requests are blocked
+- ChromaDB vector search and Gemini chat/embedding models
 - Answers restricted to the selected video's transcript
+- Local transcript seeding with `ytchatbot/seed.py`
 
 ## Tech stack
 
-Streamlit, LangChain, ChromaDB, Hugging Face, PostgreSQL/Neon, and Google OIDC.
+Streamlit, LangChain, ChromaDB Cloud, Gemini, PostgreSQL/Neon, and Google OIDC.
 
 ## Setup
 
