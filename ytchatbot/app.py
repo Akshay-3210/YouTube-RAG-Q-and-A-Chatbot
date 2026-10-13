@@ -11,7 +11,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnablePassthrough
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
-from youtube_transcript_api._errors import IpBlocked, NoTranscriptFound
+from youtube_transcript_api._errors import IpBlocked, NoTranscriptFound, RequestBlocked
 
 def format_docs(retrieved_docs):
     return "\n\n".join(doc.page_content for doc in retrieved_docs)
@@ -43,6 +43,9 @@ def render_youtube_chatbot():
 
 
     url = st.text_input("enter youtube video url")
+    pasted_transcript = st.text_area(
+        "Transcript (optional; paste it here if YouTube blocks the Cloud app)"
+    )
 
     if st.button("Load Video") and url:
         video_id = parse_qs(urlparse(url).query).get("v", [None])[0]
@@ -57,15 +60,20 @@ def render_youtube_chatbot():
         if existing["ids"]:
             st.info("Video already exists in database. Skipping saving...")
         else:
-            try:
-                transcript_list = YouTubeTranscriptApi().fetch(video_id, languages=["en"])
-                transcript = " ".join(chunk.text for chunk in transcript_list)
-            except (TranscriptsDisabled, NoTranscriptFound):
-                st.error("No transcript available")
-                return
-            except IpBlocked:
-                st.error("Youtube is temporarily blocking transcript requests from this IP.")
-                return
+            transcript = pasted_transcript.strip()
+            if not transcript:
+                try:
+                    transcript_list = YouTubeTranscriptApi().fetch(video_id, languages=["en"])
+                    transcript = " ".join(chunk.text for chunk in transcript_list)
+                except (TranscriptsDisabled, NoTranscriptFound):
+                    st.error("No transcript available. Paste a transcript above and try again.")
+                    return
+                except (IpBlocked, RequestBlocked):
+                    st.error(
+                        "YouTube blocked requests from this Cloud server. "
+                        "Paste the video's transcript above and click Load Video again."
+                    )
+                    return
 
             chunks = splitter.create_documents(
                 [transcript], metadatas=[{"video_id": video_id, "source": url}]
