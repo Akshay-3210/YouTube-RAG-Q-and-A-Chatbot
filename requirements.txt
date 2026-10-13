@@ -10,3 +10,4 @@ langchain-core
 langchain-huggingface
 huggingface-hub
 youtube-transcript-api
+sentence-transformers
