@@ -63,7 +63,7 @@ SMTP_PASSWORD="your-gmail-app-password"
 
 ### 5. Configure YouTube chatbot credentials
 
-Copy `ytchatbot/.env.example` to `ytchatbot/.env`, then add your Hugging Face
+Copy `ytchatbot/.env.example` to `ytchatbot/.env`, then add your Gemini API key
 and Chroma credentials:
 
 ```bash
@@ -71,7 +71,7 @@ cp ytchatbot/.env.example ytchatbot/.env
 ```
 
 This file is separate from `.env`: `.env` contains database/SMTP values and
-`ytchatbot/.env` contains YouTube chatbot service values.
+`ytchatbot/.env` contains Gemini and Chroma values.
 
 ### 6. Configure Google OIDC login
 
@@ -117,7 +117,7 @@ Open `http://localhost:8501` in your browser.
 DATABASE_URL = "your-neon-database-url"
 SMTP_EMAIL = "your-email@gmail.com"
 SMTP_PASSWORD = "your-gmail-app-password"
-HUGGINGFACEHUB_API_TOKEN = "your-hugging-face-token"
+GOOGLE_API_KEY = "your-gemini-api-key"
 CHROMA_API_KEY = "your-chroma-api-key"
 CHROMA_TENANT = "your-chroma-tenant"
 CHROMA_DATABASE = "your-chroma-database"
@@ -139,3 +139,8 @@ https://your-app.streamlit.app/oauth2callback
 
 `Authlib` is listed in `requirements.txt` because Streamlit requires it for
 `st.login()`.
+
+The app uses Gemini Developer API free-tier models for chat and embeddings.
+Free-tier quotas are limited and can change. Keep the Google AI Studio project
+on the free tier (do not attach paid billing) to avoid API charges. Google says
+free-tier API content may be used to improve its products.

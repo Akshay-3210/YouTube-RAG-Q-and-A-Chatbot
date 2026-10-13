@@ -9,10 +9,9 @@ from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnablePassthrough
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFaceEndpointEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from youtube_transcript_api._errors import IpBlocked, NoTranscriptFound
-from huggingface_hub.errors import HfHubHTTPError
 
 def format_docs(retrieved_docs):
     return "\n\n".join(doc.page_content for doc in retrieved_docs)
@@ -21,22 +20,15 @@ def format_docs(retrieved_docs):
 def render_youtube_chatbot():
     load_dotenv(Path(__file__).with_name(".env"))
 
-    hf_token = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN")
-    if not hf_token:
-        st.error("HF_TOKEN is missing. Add it to ytchatbot/.env.")
+    google_api_key = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
+    if not google_api_key:
+        st.error("GOOGLE_API_KEY is missing. Add it to Streamlit secrets or ytchatbot/.env.")
         st.stop()
 
-    os.environ.setdefault("HUGGINGFACEHUB_API_TOKEN", hf_token)
+    os.environ["GOOGLE_API_KEY"] = google_api_key
 
-    embedding = HuggingFaceEndpointEmbeddings(
-        model="sentence-transformers/all-MiniLM-L6-v2"
-    )
-    llm = HuggingFaceEndpoint(
-        repo_id="Qwen/Qwen3.8-27B:ovhcloud",
-        task="text-generation",
-        temperature=0,
-    )
-    model = ChatHuggingFace(llm=llm)
+    embedding = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2")
+    model = ChatGoogleGenerativeAI(model="gemini-3.8-flash", temperature=0)
 
     cloud_client = chromadb.CloudClient(
         api_key=os.getenv("CHROMA_API_KEY"),
@@ -46,7 +38,7 @@ def render_youtube_chatbot():
     vector_store = Chroma(
         client=cloud_client,
         embedding_function=embedding,
-        collection_name="sample",
+        collection_name="sample_gemini",
     )
 
 
@@ -118,8 +110,5 @@ def render_youtube_chatbot():
                 try:
                     answer = main_chain.invoke(question)
                     st.write(answer)
-                except HfHubHTTPError as e:
-                    st.error(f"HTTP Status: {e.response.status_code}")
-                    st.code(str(e))
                 except Exception as e:
                     st.error(f"{type(e).__name__}: {e}")

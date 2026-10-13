@@ -7,7 +7,5 @@ chromadb
 langchain-chroma
 langchain-classic
 langchain-core
-langchain-huggingface
-huggingface-hub
+langchain-google-genai
 youtube-transcript-api
-sentence-transformers
